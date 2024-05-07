@@ -1,3 +1,7 @@
 # GAS
 gas/node_modules
 gas/dist/app.js
+
+# Lambda
+lambda/vendor
+lambda/packaged-template.yml
