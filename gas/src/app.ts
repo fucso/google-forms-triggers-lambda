@@ -1,15 +1,31 @@
 
 declare let global: any;
 global.onFromSubmit = (e: GoogleAppsScript.Events.FormsOnFormSubmit) => {
-  const answers =  e.response.getItemResponses().map(res => {
-    return {
-      title: res.getItem().getTitle(), 
-      type: res.getItem().getType().toString(),
-      values: res.getResponse() 
-    };
-  }).filter(v => v);
+  const formResponse =  e.response.getItemResponses().find(res => res.getItem().getTitle() === 'csv')
+  if (!formResponse) {
+    return;
+  }
 
-  console.log(answers);
+  const answer = {
+    title: formResponse.getItem().getTitle(),
+    type: formResponse.getItem().getType().toString(),
+    values: formResponse.getResponse()
+  };
+  console.log('answer', answer);
+
+  const url = PropertiesService.getScriptProperties().getProperty('LAMBDA_URL');
+  if (!url) {
+    return;
+  }
+
+  const path = `${url}/?file_id=${answer.values[0]}`;
+  console.log('path', path);
+  const options: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
+    method: 'get',
+    contentType: 'application/json'
+  };
+  const response = UrlFetchApp.fetch(path, options);
+  console.log('result', response.getContentText());
 };
 
 const extractFileIdFromUrl = (url: string) => {
