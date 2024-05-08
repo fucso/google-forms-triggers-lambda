@@ -6,11 +6,11 @@ def handler(event:, context:)
   drive = Google::Apis::DriveV3::DriveService.new
   drive.authorization = auth(ENV['GOOGLE_CLIENT_EMAIL'], ENV['GOOGLE_PRIVATE_KEY'])
 
-  file_id = event['file_id']
+  file_id = event['queryStringParameters']['file_id']
   file = drive.get_file(file_id, download_dest: '/tmp/file.csv')
   content = File.read('/tmp/file.csv')
   
-  {
+  return {
     statusCode: 200,
     body: JSON.generate({
       content: content
